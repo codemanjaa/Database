@@ -1,4 +1,4 @@
-
+-- It stops the non repeatable read  but allows new rows
 
 SET TRANSACTION ISOLATION LEVEL REPEATABLE READ
 BEGIN TRAN 
@@ -9,5 +9,22 @@ WAITFOR DELAY '00:00:15'
 SELECT * FROM bank_account 
 
 ROLLBACK TRAN
+
+--SOLUTION for the phantom
+
+
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE
+BEGIN TRAN 
+SELECT * FROM bank_account 
+
+WAITFOR DELAY '00:00:15'
+
+SELECT * FROM bank_account 
+
+ROLLBACK TRAN
+
+
+
+
 
 
