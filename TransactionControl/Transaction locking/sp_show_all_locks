@@ -1,0 +1,29 @@
+-- =============================================
+-- Author:		<Mayura>
+-- Create date: <16-03-2017>
+-- Description:	<Haaga-Helia UAS>
+-- =============================================
+CREATE PROCEDURE sp_show_all_locks
+AS
+
+SELECT request_session_id,
+	CASE resource_type
+		WHEN 'OBJECT' THEN 'TABLE '+ OBJECT_NAME (resource_associated_entity_id)
+		WHEN 'RID' THEN 'ROW ' + resource_description
+		ELSE resource_type + ' ' + resource_description
+	END AS "locked resource",
+	request_mode AS "lock type",
+	request_status, 
+		CASE
+			WHEN request_status IN ('WAIT', 'CONVERT') THEN
+				(SELECT cmd FROM sys.sysprocesses WHERE spid = dtl.request_session_id)
+ ELSE ' '
+END AS "statement",
+CASE 
+WHEN request_status IN ('WAIT', 'CONVERT') THEN
+CAST ((SELECT blocked FROM sys.sysprocesses WHERE spid = dtl.request_session_id) AS VARCHAR(5))
+ELSE ' '
+END AS "blocked by"
+FROM sys.dm_tran_locks dtl 
+WHERE resource_type <> 'DATABASE'
+ORDER BY request_session_id, resource_type, resource_description
