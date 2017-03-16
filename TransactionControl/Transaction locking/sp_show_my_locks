@@ -1,0 +1,23 @@
+-- =============================================
+-- Author:		<Mayura>
+-- Create date: <16-03-2017>
+-- Description:	<show_my_locks>
+-- =============================================
+CREATE PROCEDURE sp_show_my_locks
+AS
+SELECT 
+		request_session_id AS "my session id",
+		CASE resource_type
+			WHEN 'DATABASE' THEN 'DATABASE '+
+				(SELECT name FROM sys.databases WHERE database_id =
+	resource_database_id)
+	WHEN 'OBJECT' THEN 'TABLE '+OBJECT_NAME (resource_associated_entity_id)
+	WHEN 'RID' THEN 'ROW '+ resource_description
+	ELSE resource_type + ' ' + resource_description 
+	END AS "locked resource",
+	request_mode AS "lock type"
+FROM sys.dm_tran_locks
+WHERE request_session_id = @@SPID
+ORDER BY resource_type, resource_description
+
+--End
