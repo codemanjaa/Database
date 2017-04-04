@@ -19,3 +19,6 @@ RESTORE LOG RestTest FROM DISK = 'C:\DBP_backups\RestTest_log_t5.bak' WITH NOREC
 
 RESTORE DATABASE RestTest WITH RECOVERY
 
+USE RestTest
+SELECT * FROM Test
+
