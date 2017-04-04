@@ -1,10 +1,10 @@
+-- Create a tail-log backup
+
 BACKUP LOG RestTest TO DISK = 'E:\DBP_backups\RestTest_log_t7.bak' WITH CONTINUE_AFTER_ERROR
 
 
 
 --Start from the last full backup
-
-
 
 RESTORE DATABASE RestTest FROM DISK = 'E:\DBP_backups\RestTest_full_t1.bak' WITH NORECOVERY
 
@@ -14,7 +14,7 @@ RESTORE DATABASE RestTest FROM DISK = 'E:\DBP_backups\RestTest_full_t1.bak' WITH
 
 
 
-RESTORE DATABASE RestTest FROM DISK = 'E:\DBP_backups\RestTest_differential_t4.bak'
+RESTORE DATABASE RestTest FROM DISK = 'E:\DBP_backups\RestTest_differential_t4.bak' WITH NORECOVERY
 
 
 
@@ -34,8 +34,5 @@ RESTORE LOG RestTest FROM DISK = 'E:\DBP_backups\RestTest_log_t6.bak' WITH NOREC
 
 RESTORE DATABASE RestTest WITH RECOVERY
 
-
-
 USE RestTest
-
-SELECT * FROM Test
+select * from Test
