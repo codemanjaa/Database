@@ -1,4 +1,4 @@
-UUSE RestTest
+USE RestTest
 
 CREATE TABLE Test(
 id INT NOT NULL PRIMARY KEY,
