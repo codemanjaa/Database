@@ -31,15 +31,16 @@ DECLARE @account_number INT
 DECLARE @balance DECIMAL(11,2)
 DECLARE @username VARCHAR(20)
 
-SELECT @username = master.dbo.sysprocesses WHERE spid = @@SPID
+SELECT @username = spid FROM master.dbo.sysprocesses  WHERE spid = @@SPID
 
 
-SELECT @account_number = INSERTRED.account_number, @balance = INSERTED.balance
+SELECT @account_number = INSERTED.account_number, @balance = INSERTED.balance
 FROM INSERTED
-INSERT INTO History(account_number,modification_date,modification_time,username,modification_type) VALUES
-(@account_number, @balance,CONVERT(date, GETDATE()), CONVERT(date, CURRENT_TIMESTAMP), @username, 'INSERT' )
-AS print 'INSERT DONE'
+INSERT INTO History (account_number,modification_date, modification_time, username, modification_type, old_balance, new_balance) VALUES
+(@account_number, CONVERT(date, GETDATE()), CONVERT(time, CURRENT_TIMESTAMP), @username, 'INSERT', null, null)
 
 END
 
 INSERT INTO Account (account_number,balance) VALUES(2, 15000.00)
+
+SELECT * FROM History
