@@ -49,19 +49,26 @@ SELECT * FROM History
 
 
 ALTER TRIGGER Account_Update_balance_Trigger ON Account
+
 AFTER UPDATE
 AS
 	IF UPDATE(balance)
 
 		BEGIN
-			SELECT old.balance AS 'Old Balance',
-				   new.balance AS 'New balance'
+		DECLARE @oldbalance DECIMAL(11,2)
+		DECLARE @newbalance DECIMAL(11,2)
+
+			SELECT @oldbalance = old.balance,
+				   @newbalance =new.balance
 			FROM DELETED AS old
 				 JOIN INSERTED AS new ON (new.account_number = old.account_number)
 
+				 UPDATE History SET new_balance = @newbalance, old_balance = @oldbalance FROM History JOIN inserted 
+				 ON History.account_number = inserted.account_number
+
 --			SELECT @oldbalance = DELETED.balance, @newbalance = DELETED.new_balance FROM DELETED
-		UPDATE History SET old_balance = old.balance, new_balance = old.balance FROM DELETED as old JOIN History AS new ON
-		(new.account_number = old.account_number)
+	--	UPDATE History SET old_balance = old.balance, new_balance = old.balance FROM DELETED as old JOIN History AS new ON
+	--	(new.account_number = old.account_number)
 				 
 				 
 print 'Update balance success'			 
@@ -73,7 +80,7 @@ END
 
 
 
-UPDATE Account set balance = 50000.00 WHERE account_number = 2
+UPDATE Account set balance = 350000.00 WHERE account_number = 2
 
 SELECT * FROM Account
 SELECT * FROM History
