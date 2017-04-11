@@ -41,6 +41,7 @@ INSERT INTO History (account_number,modification_date, modification_time, userna
 
 END
 
+print 'INSERT Success'
 INSERT INTO Account (account_number,balance) VALUES(2, 15000.00)
 
 SELECT * FROM History
