@@ -1,4 +1,5 @@
 
+
 --TASK 1
 
 
@@ -80,17 +81,15 @@ AFTER UPDATE
 				DECLARE @oldbalance DECIMAL(11,2)
 				DECLARE @newbalance DECIMAL(11,2)
  
- 			SELECT @oldbalance = old.balance,
- 				   @newbalance =new.balance
+ 				SELECT @oldbalance = old.balance,
+ 					   @newbalance = new.balance
   					FROM DELETED AS old
   					 JOIN INSERTED AS new ON (new.account_number = old.account_number)
   
- 				 UPDATE History SET new_balance = @newbalance, old_balance = @oldbalance FROM History
+ 				 UPDATE History SET new_balance = @newbalance, old_balance = @oldbalance, SET modiftication_type = 'UPDATE' FROM History
 				 JOIN inserted 
  				 ON History.account_number = inserted.account_number
-
-
-			
+				 				 		
 		END
 
 ---------- Testing Update Trigger
@@ -99,3 +98,30 @@ UPDATE Account SET balance = 35000.00 WHERE account_number = 1
 
 SELECT * FROM History
 SELECT * FROM Account
+
+
+
+---------- DELETING Trigger-------------------------
+
+CREATE TRIGGER Account_Delete_Trigger ON ACCOUNT
+
+AFTER DELETE
+
+		AS  
+			BEGIN
+				
+			DECLARE @account_number VARCHAR(12)
+
+			SELECT @account_number = deleted.account_number 
+			FROM deleted
+
+			DELETE FROM History
+			WHERE account_number = @account_number
+
+
+			END
+	print 'DELETED'
+
+
+
+DELETE FROM Account WHERE account_number = 1
