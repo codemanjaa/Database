@@ -35,7 +35,7 @@ new_balance DECIMAL(11,2)
 
 -------------- INSERT TRIGGER--------------------------------------------
 
-CREATE TRIGGER Account_Insert_Trigger ON Account
+ALTER TRIGGER Account_Insert_Trigger ON Account
 
 AFTER INSERT
 
@@ -50,10 +50,12 @@ AFTER INSERT
 
 			SELECT @account_number = account_number, @balance = balance
 			FROM inserted
-			INSERT INTO History VALUES(
-			@account_number, CONVERT(DATE, GETDATE()), CONVERT(TIME, CURRENT_TIMESTAMP), @username, 'INSERT', @balance, @balance 
+			INSERT INTO HistoryView VALUES(@account_number,'INSERT', @balance, @balance, @username)
+
+			--INSERT INTO History VALUES(
+			--@account_number, CONVERT(DATE, GETDATE()), CONVERT(TIME, CURRENT_TIMESTAMP), @username, 'INSERT', @balance, @balance 
 			
-			)
+			--)
 		END
 
 		print 'INSERT Success!!!'
@@ -61,15 +63,15 @@ AFTER INSERT
 
 ------------------ Testing Insertion 1----------------
 
-INSERT INTO Account VALUES( 1, 15000.00)
-SELECT * FROM History
+INSERT INTO Account VALUES( 10, 15000.00)
+SELECT * FROM HistoryView
 
 
 
 
 -------- UPDATE TRIGGER---
 
-CREATE TRIGGER Account_Update_Balance_Trigger ON Account
+ALTER TRIGGER Account_Update_Balance_Trigger ON Account
 
 AFTER UPDATE 
 	AS
@@ -109,7 +111,7 @@ SELECT * FROM Account
 
 ---------- DELETING Trigger-------------------------
 
-CREATE TRIGGER Account_Delete_Trigger ON ACCOUNT
+ALTER TRIGGER Account_Delete_Trigger ON ACCOUNT
 
 AFTER DELETE
 
@@ -133,7 +135,7 @@ AFTER DELETE
 
 
 
-DELETE FROM Account WHERE account_number = 1
+DELETE FROM Account WHERE account_number = 5
 
 
 INSERT INTO Account VALUES (3, 5000.00)
@@ -142,6 +144,32 @@ SELECT * FROM account
 SELECT * FROM History
 
 
-UPDATE Account SET balance = 125000 WHERE account_number = 3
+UPDATE Account SET balance = 125000 WHERE account_number = 5
+
+
+
+insert into account VALUES(6, 3000)
+
+
+-- CREATE VIEW
+
+
+
+CREATE VIEW HistoryView AS
+SELECT account_number, modification_type, old_balance, new_balance, username FROM History
+
+SELECT * FROM HistoryView
+
+
+CREATE TRIGGER History_Insert_Trigger ON HistoryView
+
+AFTER INSERT
+
+	AS
+		BEGIN
+			
+
+
+		END
 
 
