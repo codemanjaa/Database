@@ -77,18 +77,24 @@ AFTER UPDATE
 
 			IF UPDATE(balance)
 			
-				
+				DECLARE @account_number VARCHAR(12)
 				DECLARE @oldbalance DECIMAL(11,2)
 				DECLARE @newbalance DECIMAL(11,2)
+				DECLARE @username VARCHAR(12)
+
+				SELECT @username = nt_username FROM master.dbo.sysprocesses WHERE spid = @@spid
  
  				SELECT @oldbalance = old.balance,
- 					   @newbalance = new.balance
+ 					   @newbalance = new.balance,
+					   @account_number = new.account_number
   					FROM DELETED AS old
   					 JOIN INSERTED AS new ON (new.account_number = old.account_number)
   
- 				 UPDATE History SET new_balance = @newbalance, old_balance = @oldbalance, SET modiftication_type = 'UPDATE' FROM History
-				 JOIN inserted 
- 				 ON History.account_number = inserted.account_number
+					INSERT INTO History VALUES (@account_number, CONVERT(DATE, GETDATE()), CONVERT(TIME, CURRENT_TIMESTAMP), @username,'UPDATE', @oldbalance, @newbalance)
+
+ 				-- UPDATE History SET new_balance = @newbalance, old_balance = @oldbalance,  modification_type = 'UPDATE' FROM History
+				 --JOIN inserted 
+ 				 --ON History.account_number = inserted.account_number
 				 				 		
 		END
 
@@ -111,12 +117,15 @@ AFTER DELETE
 			BEGIN
 				
 			DECLARE @account_number VARCHAR(12)
+			DECLARE @username VARCHAR(20)
 
+			SELECT @username = nt_username FROM master.dbo.sysprocesses WHERE spid = @@spid
 			SELECT @account_number = deleted.account_number 
 			FROM deleted
 
-			DELETE FROM History
-			WHERE account_number = @account_number
+			--DELETE FROM History WHERE account_number = @account_number
+			
+			INSERT INTO History Values(@account_number, CONVERT(DATE, GETDATE()), CONVERT(TIME, CURRENT_TIMESTAMP), @username, 'DELETE', NULL, NULL)
 
 
 			END
@@ -125,3 +134,14 @@ AFTER DELETE
 
 
 DELETE FROM Account WHERE account_number = 1
+
+
+INSERT INTO Account VALUES (3, 5000.00)
+
+SELECT * FROM account
+SELECT * FROM History
+
+
+UPDATE Account SET balance = 125000 WHERE account_number = 3
+
+
