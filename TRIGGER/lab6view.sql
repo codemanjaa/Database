@@ -1,10 +1,8 @@
-
-
 --TASK 1
 
 
-CREATE DATABASE Test
-USE Test
+CREATE DATABASE TestDB
+USE TestDB
 
 -------DDL Account Table
 
@@ -35,7 +33,7 @@ new_balance DECIMAL(11,2)
 
 -------------- INSERT TRIGGER--------------------------------------------
 
-ALTER TRIGGER Account_Insert_Trigger ON Account
+CREATE TRIGGER Account_Insert_Trigger ON Account
 
 AFTER INSERT
 
@@ -63,7 +61,7 @@ AFTER INSERT
 
 ------------------ Testing Insertion 1----------------
 
-INSERT INTO Account VALUES( 10, 15000.00)
+INSERT INTO Account VALUES( 1, 15000.00)
 SELECT * FROM HistoryView
 
 
@@ -71,7 +69,7 @@ SELECT * FROM HistoryView
 
 -------- UPDATE TRIGGER---
 
-ALTER TRIGGER Account_Update_Balance_Trigger ON Account
+CREATE TRIGGER Account_Update_Balance_Trigger ON Account
 
 AFTER UPDATE 
 	AS
@@ -111,7 +109,7 @@ SELECT * FROM Account
 
 ---------- DELETING Trigger-------------------------
 
-ALTER TRIGGER Account_Delete_Trigger ON ACCOUNT
+CREATE TRIGGER Account_Delete_Trigger ON ACCOUNT
 
 AFTER DELETE
 
@@ -141,14 +139,14 @@ DELETE FROM Account WHERE account_number = 5
 INSERT INTO Account VALUES (3, 5000.00)
 
 SELECT * FROM account
-SELECT * FROM History
+SELECT * FROM HistoryView
 
 
 UPDATE Account SET balance = 125000 WHERE account_number = 5
 
 
 
-insert into account VALUES(6, 3000)
+insert into account VALUES(1, 3000)
 
 
 -- CREATE VIEW
@@ -163,16 +161,22 @@ SELECT * FROM HistoryView
 -----------------------------------------------------------------------------------------------------------------------
 CREATE TRIGGER History_Insert_Trigger ON HistoryView
 
-AFTER INSERT
+INSTEAD OF INSERT
 
 	AS
 		BEGIN
-			
-			SELECT * FROM inserted
+			DECLARE @account_number VARCHAR(12)
+			DECLARE @modification_type VARCHAR(6)
+			DECLARE @old_balance DECIMAL(11,2)
+			DECLARE @new_balance DECIMAL(11,2)
+			DECLARE @username VARCHAR(20)
+
+			SELECT @account_number = i.account_number, @modification_type = i.modification_type, @old_balance = i.old_balance, @new_balance = i.new_balance, @username = i.username
+			FROM inserted i
+
 			INSERT INTO History VALUES(
-			account_number, CONVERT(DATE, GETDATE()), CONVERT(TIME, CURRENT_TIMESTAMP), username, 'INSERT', balance, balance )
+			@account_number, CONVERT(DATE, GETDATE()), CONVERT(TIME, CURRENT_TIMESTAMP), @username, 'INSERT', @old_balance, @new_balance )
 
 		END
 
 	print 'INSERY History View to History'
-	
